@@ -33,6 +33,40 @@ let setOperation;//what mathematical operation is currently set
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
 
+decimalButton.addEventListener('click',()=>{//add decimals
+
+//copied
+    let character = document.createElement('span');//creates span to add symbol
+    if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, add to first number
+        if (firstNumber===""){//if no number is entered, pressing the decimal buttons creates "0."
+            firstNumber+="0."
+            screen.appendChild(character);
+            character.textContent="0."//writes on the screen
+        }
+        else {
+            if (!String(firstNumber).includes(".")){//makes sure there is no decimal symbol already, so that it does not appear multiple times in a single number
+                firstNumber+="."
+                screen.appendChild(character);
+                character.textContent="."//writes decimal symbol on the screen
+                subsequent=false;//if you start adding a decimal to a result, you do not want the next digit to erase the number
+            }
+        }
+    }
+    else {
+        if (secondNumber===""){
+            secondNumber+="0."
+            screen.appendChild(character);
+            character.textContent="0."//writes on the screen
+        }
+        if (!String(secondNumber).includes(".")){
+            secondNumber+="."
+            screen.appendChild(character);
+            character.textContent="."
+        }
+    }
+
+//end
+})
 
 let numberButtons = [zero, one, two, three, four, five, six, seven, eight, nine]//used in the loop below to apply proper numbers to the buttons
 for (i=0;i<numberButtons.length;i++){
@@ -40,7 +74,7 @@ for (i=0;i<numberButtons.length;i++){
     numberButtons[i].addEventListener('click',()=>{//sets what the buttons do
         let character = document.createElement('span');//creates span to add numbers
 
-        if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, //(setOperation === null||setOperation === undefined)&&(firstNumber === "")
+        if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, //
             //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
             if (subsequent===true){//aftermath of calculation, clears screen and then clears the subsequent status
                 firstNumber="";//clears firstNumber
