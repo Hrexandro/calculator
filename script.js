@@ -30,6 +30,9 @@ const operationButtons = document.getElementsByClassName("operationButton")
 let firstNumber ="";
 let secondNumber="";
 let setOperation;//what mathematical operation is currently set
+let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
+//the firstNumber is substituted and not added to
+
 
 let numberButtons = [zero, one, two, three, four, five, six, seven, eight, nine]//used in the loop below to apply proper numbers to the buttons
 for (i=0;i<numberButtons.length;i++){
@@ -37,7 +40,15 @@ for (i=0;i<numberButtons.length;i++){
     numberButtons[i].addEventListener('click',()=>{//sets what the buttons do
         let character = document.createElement('span');//creates span to add numbers
 
-        if (setOperation === null||setOperation === undefined){//if no operation is chosen yet, you are picking the first number (????what about when calculating after an operation????)
+        if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, //(setOperation === null||setOperation === undefined)&&(firstNumber === "")
+            //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
+            if (subsequent===true){//aftermath of calculation, clears screen and then clears the subsequent status
+                firstNumber="";//clears firstNumber
+                for (i=screen.children.length-1;i>=0;i--){//clears screen
+                    screen.children[i].remove();
+                }
+                subsequent=false;
+            }
             firstNumber+=`${thisPosition}`
             screen.appendChild(character);
             character.textContent=`${thisPosition}`//writes numbers on the screen
@@ -61,13 +72,23 @@ addOperationEvent(minusButton,subtract);
 addOperationEvent(multiplyButton,multiply);
 addOperationEvent(divideButton,divide);
 equalsButton.addEventListener('click',()=>{
-    for (i=screen.children.length-1;i>=0;i--){//clear screen
-        screen.children[i].remove()
+    if (setOperation === null||setOperation === undefined){
+        return//if you're just pressing "=" nothing happens
     }
-    let result=operate(firstNumber,secondNumber,setOperation)//calculate
-    let character = document.createElement('span');
-    screen.appendChild(character);
-    character.textContent=`${result}`//writes result on the screen
+    else {
+        for (i=screen.children.length-1;i>=0;i--){//clear screen
+            screen.children[i].remove();
+        }
+        let result=operate(firstNumber,secondNumber,setOperation)//calculate
+        let character = document.createElement('span');
+        screen.appendChild(character);
+        character.textContent=`${result}`;//writes result on the screen
+        firstNumber=result;
+        secondNumber="";
+        setOperation=null;
+        subsequent = true
+    }
+    
 
 //have it calculate and remove the numbers from screen and present the calculation, then clear both first and second number
 })
