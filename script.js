@@ -1,3 +1,10 @@
+/*TO DO
+
+
+
+*/
+
+
 const one = document.getElementById("one");
 const two = document.getElementById("two");
 const three = document.getElementById("three");
@@ -15,6 +22,7 @@ const minusButton = document.getElementById("minus")
 const multiplyButton = document.getElementById("multiply")
 const divideButton = document.getElementById("divide")
 const equalsButton = document.getElementById("equals")
+const signButton = document.getElementById("sign")
 
 const screen = document.getElementById("screen");
 
@@ -29,15 +37,81 @@ const operationButtons = document.getElementsByClassName("operationButton")
 
 let firstNumber ="";
 let secondNumber="";
+let activeNo=1;//sets whether you are entering the first number or second
 let setOperation;//what mathematical operation is currently set
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
 
-decimalButton.addEventListener('click',()=>{//add decimals
-
-//copied
+signButton.addEventListener('click',()=>{//+/-button changes the sign of the current number
+//sign func////////////////////////////////////////////////////////////////////////////////////////////////////
+    clearScreen();//clears screen, fills it later according to variables
     let character = document.createElement('span');//creates span to add symbol
-    if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, add to first number
+
+    if (activeNo===1){
+        if (Number(firstNumber)>0){//if number is positive, prepend the negative sign
+            firstNumber=-Math.abs(Number(firstNumber))//change the variable
+            screen.appendChild(character);
+            character.textContent=`${firstNumber}`//writes on the screen
+    
+        }
+        else if (Number(firstNumber)<0){//if number is negative, remove the negative sign
+            firstNumber=Math.abs(Number(firstNumber))
+            screen.appendChild(character);
+            character.textContent=`${firstNumber}`//writes on the screen
+        }
+    }
+    else if (activeNo===2){
+        if (Number(secondNumber)>0){//if number is positive, prepend the negative sign
+            secondNumber=-Math.abs(Number(secondNumber))
+            screen.appendChild(character);
+            character.textContent=`${secondNumber}`//writes on the screen
+
+        }
+        else if (Number(secondNumber)<0){//if number is negative, remove the negative sign
+            secondNumber=Math.abs(Number(secondNumber))
+            screen.appendChild(character);
+            character.textContent=`${secondNumber}`//writes on the screen
+        }
+    }
+
+
+
+
+
+    // if (activeNo===1){//if no operation is chosen yet, add to first number
+    //     if (firstNumber===""){//if no number is entered
+    //         firstNumber+="0."
+    //         screen.appendChild(character);
+    //         character.textContent="0."//writes on the screen
+    //     }
+    //     else {
+    //         if (!String(firstNumber).includes(".")){//makes sure there is no decimal symbol already, so that it does not appear multiple times in a single number
+    //             firstNumber+="."
+    //             screen.appendChild(character);
+    //             character.textContent="."//writes decimal symbol on the screen
+    //             subsequent=false;//if you start adding a decimal to a result, you do not want the next digit to erase the number
+    //         }
+    //     }
+    // }
+    // else {//if activeNo is not 1 then it is 2
+    //     if (secondNumber===""){
+    //         secondNumber+="0."
+    //         screen.appendChild(character);
+    //         character.textContent="0."//writes on the screen
+    //     }
+    //     else if (!String(secondNumber).includes(".")){
+    //         secondNumber+="."
+    //         screen.appendChild(character);
+    //         character.textContent="."
+    //     }
+    // }
+//sign func end////////////////////////////////////////////////////////////////////////////////////////////////////
+
+})
+
+decimalButton.addEventListener('click',()=>{//add decimals
+    let character = document.createElement('span');//creates span to add symbol
+    if (activeNo===1){//if no operation is chosen yet, add to first number
         if (firstNumber===""){//if no number is entered, pressing the decimal buttons creates "0."
             firstNumber+="0."
             screen.appendChild(character);
@@ -52,20 +126,18 @@ decimalButton.addEventListener('click',()=>{//add decimals
             }
         }
     }
-    else {
+    else {//if activeNo is not 1 then it is 2
         if (secondNumber===""){
             secondNumber+="0."
             screen.appendChild(character);
             character.textContent="0."//writes on the screen
         }
-        if (!String(secondNumber).includes(".")){
+        else if (!String(secondNumber).includes(".")){
             secondNumber+="."
             screen.appendChild(character);
             character.textContent="."
         }
     }
-
-//end
 })
 
 let numberButtons = [zero, one, two, three, four, five, six, seven, eight, nine]//used in the loop below to apply proper numbers to the buttons
@@ -74,13 +146,11 @@ for (i=0;i<numberButtons.length;i++){
     numberButtons[i].addEventListener('click',()=>{//sets what the buttons do
         let character = document.createElement('span');//creates span to add numbers
 
-        if ((setOperation === null||setOperation === undefined)){//if no operation is chosen yet, //
+        if (activeNo===1){//if no operation is chosen yet, //
             //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
             if (subsequent===true){//aftermath of calculation, clears screen and then clears the subsequent status
                 firstNumber="";//clears firstNumber
-                for (i=screen.children.length-1;i>=0;i--){//clears screen
-                    screen.children[i].remove();
-                }
+                clearScreen();
                 subsequent=false;
             }
             firstNumber+=`${thisPosition}`
@@ -89,9 +159,7 @@ for (i=0;i<numberButtons.length;i++){
         }
         else {
             if(secondNumber===""){//if you have not started entering the second number, it clears the screen
-                for (i=screen.children.length-1;i>=0;i--){
-                    screen.children[i].remove()
-                }
+                clearScreen();
             }
             secondNumber+=`${thisPosition}`//set second number
             screen.appendChild(character);
@@ -110,9 +178,7 @@ equalsButton.addEventListener('click',()=>{
         return//if you're just pressing "=" nothing happens
     }
     else {
-        for (i=screen.children.length-1;i>=0;i--){//clear screen
-            screen.children[i].remove();
-        }
+        clearScreen();
         let result=operate(firstNumber,secondNumber,setOperation)//calculate
         let character = document.createElement('span');
         screen.appendChild(character);
@@ -120,16 +186,22 @@ equalsButton.addEventListener('click',()=>{
         firstNumber=result;
         secondNumber="";
         setOperation=null;
-        subsequent = true
+        activeNo=1;
     }
     
 
 //have it calculate and remove the numbers from screen and present the calculation, then clear both first and second number
 })
+function clearScreen () {
+    for (i=screen.children.length-1;i>=0;i--){//clear screen
+        screen.children[i].remove();
+    }
+}
 
 function addOperationEvent (button, operation){
     button.addEventListener('click',()=>{
         setOperation = operation
+        activeNo=2;
     })
 }
 
