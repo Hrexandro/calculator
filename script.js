@@ -1,10 +1,11 @@
 /*TO DO
 
+after making graphics, make sure the numbers do not overflow from the screen
 
+percentage is ok actually
 
+percentage after deleting the symbol???
 */
-
-
 const one = document.getElementById("one");
 const two = document.getElementById("two");
 const three = document.getElementById("three");
@@ -23,6 +24,10 @@ const multiplyButton = document.getElementById("multiply")
 const divideButton = document.getElementById("divide")
 const equalsButton = document.getElementById("equals")
 const signButton = document.getElementById("sign")
+const clearButton = document.getElementById("clear")
+const deleteButton = document.getElementById("delete")
+const rootButton = document.getElementById("sqRoot")
+const percentageButton = document.getElementById("percentage")
 
 const screen = document.getElementById("screen");
 
@@ -41,9 +46,77 @@ let activeNo=1;//sets whether you are entering the first number or second
 let setOperation;//what mathematical operation is currently set
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
+let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid thigns like "100%55"
+
+
+percentageButton.addEventListener('click',()=>{
+    clearScreen();
+    let character = document.createElement('span');
+    if (activeNo===1){
+        firstNumber=Number(firstNumber)*0.01;//0.01x's the currently active number 
+        screen.appendChild(character);
+        character.textContent=`${firstNumber}`//writes on the screen
+    }
+    else if (activeNo===2){
+        screen.appendChild(character);
+        character.textContent=`${secondNumber}`+'%'//before change of the number, to retain legibility
+        secondNumber=Number(firstNumber)*(Number(secondNumber)/100);//second number as percentage of the first no.
+        percentageSymbolPresent=true;
+    }
+})
+
+
+rootButton.addEventListener('click',()=>{//square roots the currently active number
+    clearScreen();
+    let character = document.createElement('span');
+    if (activeNo===1){
+        firstNumber=Math.sqrt(Number(firstNumber))//operation
+        screen.appendChild(character);
+        character.textContent=`${firstNumber}`//writes on the screen
+    }
+    else if (activeNo===2){
+        secondNumber=Math.sqrt(Number(secondNumber))//operation
+        screen.appendChild(character);
+        character.textContent=`${secondNumber}`//writes on the screen
+    }
+})
+
+deleteButton.addEventListener('click',()=>{//clears screen, removes last digit from variable, then puts the variable onscreen
+    clearScreen();
+    let character = document.createElement('span');
+    if (activeNo===1){
+        firstNumber=firstNumber.toString().slice(0,-1)//number is turned to a string and last character is removed
+        screen.appendChild(character);
+        character.textContent=`${firstNumber}`//writes on the screen
+    }
+    else if (activeNo===2){
+        if (percentageSymbolPresent===true){//usuwa procent a nie lcizbę
+            screen.appendChild(character);
+
+            percentageSymbolPresent=false;
+            secondNumber= 100*secondNumber/firstNumber;//is ok
+            character.textContent=`${secondNumber}`//prints the recalculated secondNumber
+        }
+        else{
+            secondNumber=secondNumber.toString().slice(0,-1)//number is turned to a string and last character is removed
+            screen.appendChild(character);
+            character.textContent=`${secondNumber}`//writes on the screen
+
+        }
+
+    }
+})
+
+clearButton.addEventListener('click',()=>{//clears everything
+    clearScreen();
+    firstNumber ="";
+    secondNumber="";
+    activeNo=1;
+    setOperation=null;
+    subsequent = false
+})
 
 signButton.addEventListener('click',()=>{//+/-button changes the sign of the current number
-//sign func////////////////////////////////////////////////////////////////////////////////////////////////////
     clearScreen();//clears screen, fills it later according to variables
     let character = document.createElement('span');//creates span to add symbol
 
@@ -73,40 +146,6 @@ signButton.addEventListener('click',()=>{//+/-button changes the sign of the cur
             character.textContent=`${secondNumber}`//writes on the screen
         }
     }
-
-
-
-
-
-    // if (activeNo===1){//if no operation is chosen yet, add to first number
-    //     if (firstNumber===""){//if no number is entered
-    //         firstNumber+="0."
-    //         screen.appendChild(character);
-    //         character.textContent="0."//writes on the screen
-    //     }
-    //     else {
-    //         if (!String(firstNumber).includes(".")){//makes sure there is no decimal symbol already, so that it does not appear multiple times in a single number
-    //             firstNumber+="."
-    //             screen.appendChild(character);
-    //             character.textContent="."//writes decimal symbol on the screen
-    //             subsequent=false;//if you start adding a decimal to a result, you do not want the next digit to erase the number
-    //         }
-    //     }
-    // }
-    // else {//if activeNo is not 1 then it is 2
-    //     if (secondNumber===""){
-    //         secondNumber+="0."
-    //         screen.appendChild(character);
-    //         character.textContent="0."//writes on the screen
-    //     }
-    //     else if (!String(secondNumber).includes(".")){
-    //         secondNumber+="."
-    //         screen.appendChild(character);
-    //         character.textContent="."
-    //     }
-    // }
-//sign func end////////////////////////////////////////////////////////////////////////////////////////////////////
-
 })
 
 decimalButton.addEventListener('click',()=>{//add decimals
@@ -128,6 +167,7 @@ decimalButton.addEventListener('click',()=>{//add decimals
     }
     else {//if activeNo is not 1 then it is 2
         if (secondNumber===""){
+            clearScreen();
             secondNumber+="0."
             screen.appendChild(character);
             character.textContent="0."//writes on the screen
@@ -158,8 +198,9 @@ for (i=0;i<numberButtons.length;i++){
             character.textContent=`${thisPosition}`//writes numbers on the screen
         }
         else {
-            if(secondNumber===""){//if you have not started entering the second number, it clears the screen
+            if(secondNumber===""||percentageSymbolPresent===true){//if you have not started entering the second number, it clears the screen
                 clearScreen();
+                secondNumber=""//needed if the percentage symbol is present
             }
             secondNumber+=`${thisPosition}`//set second number
             screen.appendChild(character);
@@ -180,6 +221,8 @@ equalsButton.addEventListener('click',()=>{
     else {
         clearScreen();
         let result=operate(firstNumber,secondNumber,setOperation)//calculate
+        result=parseFloat(result.toPrecision(30));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
+        //parseFloat removes superficial zeros caused by toPrecision
         let character = document.createElement('span');
         screen.appendChild(character);
         character.textContent=`${result}`;//writes result on the screen
@@ -187,6 +230,8 @@ equalsButton.addEventListener('click',()=>{
         secondNumber="";
         setOperation=null;
         activeNo=1;
+        subsequent=true;
+        percentageSymbolPresent=false;
     }
     
 
