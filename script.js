@@ -2,9 +2,9 @@
 
 after making graphics, make sure the numbers do not overflow from the screen
 
-percentage is ok actually
+test percentage on a person
 
-percentage after deleting the symbol???
+have multiple zeros not appear if at the beginning of a number, i.e. no "00000009"
 */
 const one = document.getElementById("one");
 const two = document.getElementById("two");
@@ -17,17 +17,19 @@ const eight = document.getElementById("eight");
 const nine = document.getElementById("nine");
 const zero = document.getElementById("zero");
 
-const decimalButton = document.getElementById("decimal")
-const plusButton = document.getElementById("plus")
-const minusButton = document.getElementById("minus")
-const multiplyButton = document.getElementById("multiply")
-const divideButton = document.getElementById("divide")
-const equalsButton = document.getElementById("equals")
-const signButton = document.getElementById("sign")
-const clearButton = document.getElementById("clear")
-const deleteButton = document.getElementById("delete")
-const rootButton = document.getElementById("sqRoot")
-const percentageButton = document.getElementById("percentage")
+const decimalButton = document.getElementById("decimal");
+const plusButton = document.getElementById("plus");
+const minusButton = document.getElementById("minus");
+const multiplyButton = document.getElementById("multiply");
+const divideButton = document.getElementById("divide");
+const equalsButton = document.getElementById("equals");
+const signButton = document.getElementById("sign");
+const clearButton = document.getElementById("clear");
+const deleteButton = document.getElementById("delete");
+const rootButton = document.getElementById("sqRoot");
+const percentageButton = document.getElementById("percentage");
+const squaredButton = document.getElementById("squared")
+const powerButton = document.getElementById("power")
 
 const screen = document.getElementById("screen");
 
@@ -73,11 +75,13 @@ rootButton.addEventListener('click',()=>{//square roots the currently active num
         firstNumber=Math.sqrt(Number(firstNumber))//operation
         screen.appendChild(character);
         character.textContent=`${firstNumber}`//writes on the screen
+        subsequent=true;
     }
     else if (activeNo===2){
         secondNumber=Math.sqrt(Number(secondNumber))//operation
         screen.appendChild(character);
         character.textContent=`${secondNumber}`//writes on the screen
+        subsequent=true;
     }
 })
 
@@ -214,6 +218,24 @@ addOperationEvent(plusButton,add);// sets the setOperation variable - the operat
 addOperationEvent(minusButton,subtract);
 addOperationEvent(multiplyButton,multiply);
 addOperationEvent(divideButton,divide);
+addOperationEvent(powerButton,power);
+squaredButton.addEventListener('click',()=>{//squares the currently active number
+    clearScreen();
+    let character = document.createElement('span');
+    if (activeNo===1){
+        firstNumber=power(firstNumber,2)//operation
+        screen.appendChild(character);
+        character.textContent=`${firstNumber}`//writes on the screen
+        subsequent=true;
+    }
+    else if (activeNo===2){
+        secondNumber=power(secondNumber,2)//operation
+        screen.appendChild(character);
+        character.textContent=`${secondNumber}`//writes on the screen
+        subsequent=true;
+    }
+    
+})
 equalsButton.addEventListener('click',()=>{
     if (setOperation === null||setOperation === undefined){
         return//if you're just pressing "=" nothing happens
@@ -278,6 +300,10 @@ function multiply (a,b) {
 
 function divide (a,b) {
     return Number(a)/Number(b);
+}
+
+function power (a,b) {
+    return Math.pow(Number(a),Number(b));
 }
 // function viewOnscreen (symbol){
 
