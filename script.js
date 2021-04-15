@@ -236,17 +236,28 @@ addOperationEvent(powerButton,power);
 squaredButton.addEventListener('click',()=>{//squares the currently active number
     clearScreen();
     let character = document.createElement('span');
+    
     if (activeNo===1){
         firstNumber=power(firstNumber,2)//operation
-        screen.appendChild(character);
-        character.textContent=`${firstNumber}`//writes on the screen
-        subsequent=true;
+        if (firstNumber===Infinity){
+            displayError();
+        }
+        else {
+            screen.appendChild(character);
+            character.textContent=`${firstNumber}`//writes on the screen
+            subsequent=true;
+        }
     }
     else if (activeNo===2){
         secondNumber=power(secondNumber,2)//operation
-        screen.appendChild(character);
-        character.textContent=`${secondNumber}`//writes on the screen
-        subsequent=true;
+        if (secondNumber===Infinity){
+            displayError();
+        }
+        else {
+            screen.appendChild(character);
+            character.textContent=`${secondNumber}`//writes on the screen
+            subsequent=true;    
+        }
     }
     
 })

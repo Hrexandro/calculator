@@ -1,5 +1,49 @@
-p {
-    border:black 1px solid ;
-    width:500px;
-    height: 1.5em;
-  }
+
+body {
+  background-color:rgb(252, 252, 149);
+  text-align:center;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items: center;
+}
+
+
+#screen {
+  background-color: rgb(77, 104, 77);
+  color:black;
+  /* font-family: 'Press Start 2P', cursive; */
+  /* font-family: 'Unica One'; */
+  font-family:'Aldrich';
+  font-size:35px;
+  padding-top:12px;
+  padding-bottom:8px;
+  width:80%;
+  margin-left: auto;
+  margin-right: auto;
+  height:30px;
+}
+
+
+#keyboard {
+  margin:25px 100px 25px 100px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr)
+}
+
+#zero{
+  grid-column: auto / span 2;
+}
+
+#calculator {
+  background-color: rgb(29, 54, 68);
+  padding: 20px;
+  border-radius:15px;
+}
+
+button {
+
+  border: black solid 1px;
+  border-radius: 5px;
+  font-size:30px;
+}
