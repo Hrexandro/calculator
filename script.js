@@ -3,8 +3,6 @@
 after making graphics, make sure the numbers do not overflow from the screen
 
 test percentage on a person
-
-have multiple zeros not appear if at the beginning of a number, i.e. no "00000009"
 */
 const one = document.getElementById("one");
 const two = document.getElementById("two");
@@ -66,25 +64,39 @@ percentageButton.addEventListener('click',()=>{
         percentageSymbolPresent=true;
     }
 })
-
-
+function displayError(){
+    clearScreen();
+    clearVariables();
+    let character = document.createElement('span');
+    screen.appendChild(character);
+    character.textContent='ERROR';//writes ERROR on the screen
+}
 rootButton.addEventListener('click',()=>{//square roots the currently active number
     clearScreen();
     let character = document.createElement('span');
     if (activeNo===1){
         firstNumber=Math.sqrt(Number(firstNumber))//operation
         screen.appendChild(character);
-        character.textContent=`${firstNumber}`//writes on the screen
-        subsequent=true;
+        if (isNaN(firstNumber)){//if the number is negative, the result is NaN
+            displayError()
+        }
+        else {
+            character.textContent=`${firstNumber}`//writes on the screen
+        }
+        subsequent=true//if it did calculate the square root, it should be subsequent, but also when it gives an ERROR, so that if you start a new calculation, the screen clears etc.
     }
     else if (activeNo===2){
         secondNumber=Math.sqrt(Number(secondNumber))//operation
         screen.appendChild(character);
-        character.textContent=`${secondNumber}`//writes on the screen
-        subsequent=true;
+        if (isNaN(secondNumber)){//if the number is negative, the result is NaN
+            displayError()
+        }
+        else {
+            character.textContent=`${secondNumber}`//writes on the screen
+        }
+        subsequent=true
     }
 })
-
 deleteButton.addEventListener('click',()=>{//clears screen, removes last digit from variable, then puts the variable onscreen
     clearScreen();
     let character = document.createElement('span');
@@ -111,14 +123,15 @@ deleteButton.addEventListener('click',()=>{//clears screen, removes last digit f
     }
 })
 
-clearButton.addEventListener('click',()=>{//clears everything
-    clearScreen();
+clearButton.addEventListener('click',clearVariables)
+clearButton.addEventListener('click',clearScreen)
+function clearVariables() {
     firstNumber ="";
     secondNumber="";
     activeNo=1;
     setOperation=null;
     subsequent = false
-})
+}
 
 signButton.addEventListener('click',()=>{//+/-button changes the sign of the current number
     clearScreen();//clears screen, fills it later according to variables
@@ -192,7 +205,8 @@ for (i=0;i<numberButtons.length;i++){
 
         if (activeNo===1){//if no operation is chosen yet, //
             //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
-            if (subsequent===true){//aftermath of calculation, clears screen and then clears the subsequent status
+            if (subsequent===true||(Number(firstNumber)===0&&!String(firstNumber).includes("."))){//aftermath of calculation, clears screen and then clears the subsequent status
+                //same if just adding zeros, so you don't end up with 00009, but does not do that if there is a decimal
                 firstNumber="";//clears firstNumber
                 clearScreen();
                 subsequent=false;
@@ -202,7 +216,7 @@ for (i=0;i<numberButtons.length;i++){
             character.textContent=`${thisPosition}`//writes numbers on the screen
         }
         else {
-            if(secondNumber===""||percentageSymbolPresent===true){//if you have not started entering the second number, it clears the screen
+            if(secondNumber===""||percentageSymbolPresent===true||(Number(secondNumber)===0&&!String(secondNumber).includes("."))){//if you have not started entering the second number, it clears the screen
                 clearScreen();
                 secondNumber=""//needed if the percentage symbol is present
             }
@@ -243,17 +257,22 @@ equalsButton.addEventListener('click',()=>{
     else {
         clearScreen();
         let result=operate(firstNumber,secondNumber,setOperation)//calculate
-        result=parseFloat(result.toPrecision(30));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
-        //parseFloat removes superficial zeros caused by toPrecision
-        let character = document.createElement('span');
-        screen.appendChild(character);
-        character.textContent=`${result}`;//writes result on the screen
-        firstNumber=result;
-        secondNumber="";
-        setOperation=null;
-        activeNo=1;
-        subsequent=true;
-        percentageSymbolPresent=false;
+        if (result===Infinity){
+            displayError();
+        }
+        else {
+            result=parseFloat(result.toPrecision(20));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
+            //parseFloat removes superficial zeros caused by toPrecision
+            let character = document.createElement('span');
+            screen.appendChild(character);
+            character.textContent=`${result}`;//writes result on the screen
+            firstNumber=result;
+            secondNumber="";
+            setOperation=null;
+            activeNo=1;
+            subsequent=true;
+            percentageSymbolPresent=false;
+        }
     }
     
 
