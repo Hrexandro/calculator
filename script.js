@@ -2,7 +2,8 @@
 
 after making graphics, make sure the numbers do not overflow from the screen
 
-test percentage on a person
+what if you write to much digits????
+what if change sign with many digits visible
 */
 const one = document.getElementById("one");
 const two = document.getElementById("two");
@@ -47,13 +48,51 @@ let setOperation;//what mathematical operation is currently set
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
 let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid thigns like "100%55"
+let digitsThatFitOnCalculatorScreen = 15;//number of digits that fit, so the symbols don't overflow the screen
 
+
+function fitOnScreen(a){
+    
+    //if the length of the floating point number is larger than 10, keep rounding until it is short enough
+    //or until it is an integer, then if the integer has more than 10 digits, throw an error
+
+    // number=parseFloat(number.toPrecision(11))
+ //   let value=parseFloat(Number(a).toFixed(10));
+    //for loop to reduce the length
+    if (a.toString().length>digitsThatFitOnCalculatorScreen){
+        while (a.toString().length>digitsThatFitOnCalculatorScreen&&a%1!==0){
+            a=a.toString().slice(0,-1) 
+        }
+    }
+
+    // for (i=value.toString().length;value.toString().length>10;i--){
+    //     console.log(i)
+    //     value=parseFloat(Number(value).toFixed(i))
+    //     console.log(value);
+    // }
+    // if (value.toString().length>10){
+    //     if(value%1!==0){//checks if it is float point number
+    //         value=parseInt(value)
+    //     }
+    //     // console.log(value);
+    //     // displayError()
+    //     // return
+    // }
+    if (a.toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the scren, returns infinity to prompt an error message
+        return Infinity
+    }
+    else {
+        return a;
+    }
+    
+}
 
 percentageButton.addEventListener('click',()=>{
     clearScreen();
     let character = document.createElement('span');
     if (activeNo===1){
         firstNumber=Number(firstNumber)*0.01;//0.01x's the currently active number 
+        firstNumber=fitOnScreen(firstNumber);
         screen.appendChild(character);
         character.textContent=`${firstNumber}`//writes on the screen
     }
@@ -76,8 +115,9 @@ rootButton.addEventListener('click',()=>{//square roots the currently active num
     let character = document.createElement('span');
     if (activeNo===1){
         firstNumber=Math.sqrt(Number(firstNumber))//operation
+        firstNumber=fitOnScreen(firstNumber);
         screen.appendChild(character);
-        if (isNaN(firstNumber)){//if the number is negative, the result is NaN
+        if (isNaN(firstNumber)||firstNumber===Infinity){//if the number is negative, the result is NaN
             displayError()
         }
         else {
@@ -87,8 +127,9 @@ rootButton.addEventListener('click',()=>{//square roots the currently active num
     }
     else if (activeNo===2){
         secondNumber=Math.sqrt(Number(secondNumber))//operation
+        secondNumber=fitOnScreen(secondNumber);
         screen.appendChild(character);
-        if (isNaN(secondNumber)){//if the number is negative, the result is NaN
+        if (isNaN(secondNumber)||firstNumber===Infinity){//if the number is negative, the result is NaN
             displayError()
         }
         else {
@@ -211,18 +252,22 @@ for (i=0;i<numberButtons.length;i++){
                 clearScreen();
                 subsequent=false;
             }
-            firstNumber+=`${thisPosition}`
-            screen.appendChild(character);
-            character.textContent=`${thisPosition}`//writes numbers on the screen
+            if (firstNumber.toString().length<digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
+                firstNumber+=`${thisPosition}`;
+                screen.appendChild(character);
+                character.textContent=`${thisPosition}`//writes numbers on the screen
+            }
         }
         else {
             if(secondNumber===""||percentageSymbolPresent===true||(Number(secondNumber)===0&&!String(secondNumber).includes("."))){//if you have not started entering the second number, it clears the screen
                 clearScreen();
                 secondNumber=""//needed if the percentage symbol is present
             }
-            secondNumber+=`${thisPosition}`//set second number
-            screen.appendChild(character);
-            character.textContent=`${thisPosition}`//writes numbers on the screen
+            if (firstNumber.toString().length<=digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
+                secondNumber+=`${thisPosition}`//set second number
+                screen.appendChild(character);
+                character.textContent=`${thisPosition}`//writes numbers on the screen
+            }
         }
         
     })
@@ -239,6 +284,7 @@ squaredButton.addEventListener('click',()=>{//squares the currently active numbe
     
     if (activeNo===1){
         firstNumber=power(firstNumber,2)//operation
+        firstNumber=fitOnScreen(firstNumber);
         if (firstNumber===Infinity){
             displayError();
         }
@@ -250,6 +296,7 @@ squaredButton.addEventListener('click',()=>{//squares the currently active numbe
     }
     else if (activeNo===2){
         secondNumber=power(secondNumber,2)//operation
+        secondNumber=fitOnScreen(secondNumber);
         if (secondNumber===Infinity){
             displayError();
         }
@@ -268,11 +315,12 @@ equalsButton.addEventListener('click',()=>{
     else {
         clearScreen();
         let result=operate(firstNumber,secondNumber,setOperation)//calculate
+        result=fitOnScreen(result)
         if (result===Infinity){
             displayError();
         }
         else {
-            result=parseFloat(result.toPrecision(20));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
+            //result=parseFloat(result.toPrecision(11));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
             //parseFloat removes superficial zeros caused by toPrecision
             let character = document.createElement('span');
             screen.appendChild(character);
@@ -285,10 +333,10 @@ equalsButton.addEventListener('click',()=>{
             percentageSymbolPresent=false;
         }
     }
-    
-
 //have it calculate and remove the numbers from screen and present the calculation, then clear both first and second number
 })
+
+
 function clearScreen () {
     for (i=screen.children.length-1;i>=0;i--){//clear screen
         screen.children[i].remove();
