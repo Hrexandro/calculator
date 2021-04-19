@@ -1,5 +1,8 @@
 /*TO DO
-  final thing to do:  Add keyboard support!!!!!!
+clear comments
+add comments to readme regarding how helpful using comments is
+
+setting operation and equals by keyboard
 }
 */
 
@@ -216,43 +219,48 @@ let numberButtons = [zero, one, two, three, four, five, six, seven, eight, nine]
 for (i=0;i<numberButtons.length;i++){
     let thisPosition=i//when the textContent is set simply as "i", it ends up as "10" for every button, because it is updated with each iteration
     numberButtons[i].addEventListener('click',()=>{//sets what the buttons do
-        let character = document.createElement('span');//creates span to add numbers
-        if (activeNo===1){//if no operation is chosen yet, //
-            //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
-            if (subsequent===true||(Number(firstNumber)===0&&!String(firstNumber).includes("."))){//aftermath of calculation, clears screen and then clears the subsequent status
-                //same if just adding zeros, so you don't end up with 00009, but does not do that if there is a decimal
-                firstNumber="";//clears firstNumber
-                clearScreen();
-                subsequent=false;
-            }
-            if (firstNumber.toString().length<digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
-                firstNumber+=`${thisPosition}`;
-                screen.appendChild(character);
-                character.textContent=`${thisPosition}`//writes numbers on the screen
-            }
-        }
-        else {
-            if(secondNumber===""||percentageSymbolPresent===true||(Number(secondNumber)===0&&!String(secondNumber).includes("."))){//if you have not started entering the second number, it clears the screen
-                clearScreen();
-                secondNumber=""//needed if the percentage symbol is present
-            }
-            if (firstNumber.toString().length<=digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
-                secondNumber+=`${thisPosition}`//set second number
-                screen.appendChild(character);
-                character.textContent=`${thisPosition}`//writes numbers on the screen
-            }
-        }
-        
+        numberTyping(thisPosition)
     })
 }
 document.onkeypress = function (e) {
     console.log(e.key)
      // use e.keyCode
  };
-// function addNumberKeyEvent (){
+ document.addEventListener ('keypress',(e)=>{
+    if (!isNaN(e.key)){//if the pressed key is a number
+        numberTyping(e.key)
+    }
+ })
 
-// }
+ function numberTyping (numberGiver){//what gives you the number, either thisPosition from the click event, or e.key from typing the key
+    let character = document.createElement('span');//creates span to add numbers
+    if (activeNo===1){//if no operation is chosen yet, //
+        //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
+        if (subsequent===true||(Number(firstNumber)===0&&!String(firstNumber).includes("."))){//aftermath of calculation, clears screen and then clears the subsequent status
+            //same if just adding zeros, so you don't end up with 00009, but does not do that if there is a decimal
+            firstNumber="";//clears firstNumber
+            clearScreen();
+            subsequent=false;
+        }
+        if (firstNumber.toString().length<digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
+            firstNumber+=`${numberGiver}`;
+            screen.appendChild(character);
+            character.textContent=`${numberGiver}`//writes numbers on the screen
+        }
+    }
+    else {
+        if(secondNumber===""||percentageSymbolPresent===true||(Number(secondNumber)===0&&!String(secondNumber).includes("."))){//if you have not started entering the second number, it clears the screen
+            clearScreen();
+            secondNumber=""//needed if the percentage symbol is present
+        }
+        if (firstNumber.toString().length<=digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
+            secondNumber+=`${numberGiver}`//set second number
+            screen.appendChild(character);
+            character.textContent=`${numberGiver}`//writes numbers on the screen
+        }
+    }
 
+}
 addOperationEvent(plusButton,add);// sets the setOperation variable - the operation that is currently chosen
 addOperationEvent(minusButton,subtract);
 addOperationEvent(multiplyButton,multiply);
