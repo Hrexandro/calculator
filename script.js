@@ -1,10 +1,9 @@
 /*TO DO
-
-after making graphics, make sure the numbers do not overflow from the screen
-
-what if you write to much digits????
-what if change sign with many digits visible
+  final thing to do:  Add keyboard support!!!!!!
+}
 */
+
+
 const one = document.getElementById("one");
 const two = document.getElementById("two");
 const three = document.getElementById("three");
@@ -34,51 +33,26 @@ const screen = document.getElementById("screen");
 
 const operationButtons = document.getElementsByClassName("operationButton")
 
-// addClickEvent(decimalButton,".")//for now ignore showing operation symbol on screen
-// addClickEvent(plusButton,"+")
-// addClickEvent(minusButton,"-")
-// addClickEvent(multiplyButton,"x")
-// addClickEvent(divideButton,":")
-// addClickEvent(equalsButton,"=")
-
 let firstNumber ="";
 let secondNumber="";
 let activeNo=1;//sets whether you are entering the first number or second
 let setOperation;//what mathematical operation is currently set
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
-let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid thigns like "100%55"
+let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid things like "100%55"
 let digitsThatFitOnCalculatorScreen = 15;//number of digits that fit, so the symbols don't overflow the screen
 
 
 function fitOnScreen(a){
-    
-    //if the length of the floating point number is larger than 10, keep rounding until it is short enough
-    //or until it is an integer, then if the integer has more than 10 digits, throw an error
+    a=Math.round(a*100000000000000)/100000000000000//to fix JS doing floating point numbers wrong, based on https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
 
-    // number=parseFloat(number.toPrecision(11))
- //   let value=parseFloat(Number(a).toFixed(10));
-    //for loop to reduce the length
     if (a.toString().length>digitsThatFitOnCalculatorScreen){
         while (a.toString().length>digitsThatFitOnCalculatorScreen&&a%1!==0){
             a=a.toString().slice(0,-1) 
         }
     }
 
-    // for (i=value.toString().length;value.toString().length>10;i--){
-    //     console.log(i)
-    //     value=parseFloat(Number(value).toFixed(i))
-    //     console.log(value);
-    // }
-    // if (value.toString().length>10){
-    //     if(value%1!==0){//checks if it is float point number
-    //         value=parseInt(value)
-    //     }
-    //     // console.log(value);
-    //     // displayError()
-    //     // return
-    // }
-    if (a.toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the scren, returns infinity to prompt an error message
+    if (a.toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the screen, returns infinity to prompt an error message
         return Infinity
     }
     else {
@@ -147,11 +121,11 @@ deleteButton.addEventListener('click',()=>{//clears screen, removes last digit f
         character.textContent=`${firstNumber}`//writes on the screen
     }
     else if (activeNo===2){
-        if (percentageSymbolPresent===true){//usuwa procent a nie lcizbę
+        if (percentageSymbolPresent===true){//removes the percentage symbol isntead of the digit
             screen.appendChild(character);
 
             percentageSymbolPresent=false;
-            secondNumber= 100*secondNumber/firstNumber;//is ok
+            secondNumber= 100*secondNumber/firstNumber;//calculated the number before changed by the percentage symbol
             character.textContent=`${secondNumber}`//prints the recalculated secondNumber
         }
         else{
@@ -243,7 +217,6 @@ for (i=0;i<numberButtons.length;i++){
     let thisPosition=i//when the textContent is set simply as "i", it ends up as "10" for every button, because it is updated with each iteration
     numberButtons[i].addEventListener('click',()=>{//sets what the buttons do
         let character = document.createElement('span');//creates span to add numbers
-
         if (activeNo===1){//if no operation is chosen yet, //
             //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
             if (subsequent===true||(Number(firstNumber)===0&&!String(firstNumber).includes("."))){//aftermath of calculation, clears screen and then clears the subsequent status
@@ -272,6 +245,13 @@ for (i=0;i<numberButtons.length;i++){
         
     })
 }
+document.onkeypress = function (e) {
+    console.log(e.key)
+     // use e.keyCode
+ };
+// function addNumberKeyEvent (){
+
+// }
 
 addOperationEvent(plusButton,add);// sets the setOperation variable - the operation that is currently chosen
 addOperationEvent(minusButton,subtract);
@@ -320,8 +300,7 @@ equalsButton.addEventListener('click',()=>{
             displayError();
         }
         else {
-            //result=parseFloat(result.toPrecision(11));//toPrecision specifies the number of displayed characters **later add error message if the number gives more characters than fits on screen**
-            //parseFloat removes superficial zeros caused by toPrecision
+
             let character = document.createElement('span');
             screen.appendChild(character);
             character.textContent=`${result}`;//writes result on the screen
@@ -333,7 +312,6 @@ equalsButton.addEventListener('click',()=>{
             percentageSymbolPresent=false;
         }
     }
-//have it calculate and remove the numbers from screen and present the calculation, then clear both first and second number
 })
 
 
@@ -349,16 +327,6 @@ function addOperationEvent (button, operation){
         activeNo=2;
     })
 }
-
-// function addClickEvent(button, symbol){//to show symbol on the screen, ignore for now
-//     button.addEventListener('click',()=>{
-//         let character = document.createElement('span');
-//         character.setAttribute('id',`${symbol}`)
-//         screen.appendChild(character);
-//         character.textContent=`${symbol}`
-//     }
-//     )
-// }
 
 function operate(a,b, operation){
     return operation(a,b)
@@ -383,6 +351,3 @@ function divide (a,b) {
 function power (a,b) {
     return Math.pow(Number(a),Number(b));
 }
-// function viewOnscreen (symbol){
-
-// }
