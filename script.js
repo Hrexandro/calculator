@@ -155,6 +155,7 @@ function clearVariables() {
     activeNo=1;
     setOperation=null;
     subsequent = false
+    removePushedClass();
 }
 
 signButton.addEventListener('click',()=>{//+/-button changes the sign of the current number
@@ -374,6 +375,10 @@ function pickOperation (operation) {//for use in setting operation with buttons 
     removePushedClass();
     setOperation = operation;
     addPushedClass(decideWhichOperationIsPushed());
+    if (firstNumber===""){
+        firstNumber=secondNumber;
+        secondNumber="";
+    }
     activeNo=2;
 }
 function decideWhichOperationIsPushed(){//decides which operation button is visually selected
