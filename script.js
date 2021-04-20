@@ -3,6 +3,8 @@ clear comments
 add comments to readme regarding how helpful using comments is
 
 setting operation and equals by keyboard
+
+highlight active operation
 }
 */
 
@@ -143,6 +145,7 @@ deleteButton.addEventListener('click',()=>{//clears screen, removes last digit f
 
 clearButton.addEventListener('click',clearVariables)
 clearButton.addEventListener('click',clearScreen)
+
 function clearVariables() {
     firstNumber ="";
     secondNumber="";
@@ -222,15 +225,8 @@ for (i=0;i<numberButtons.length;i++){
         numberTyping(thisPosition)
     })
 }
-document.onkeypress = function (e) {
-    console.log(e.key)
-     // use e.keyCode
- };
- document.addEventListener ('keypress',(e)=>{
-    if (!isNaN(e.key)){//if the pressed key is a number
-        numberTyping(e.key)
-    }
- })
+
+
 
  function numberTyping (numberGiver){//what gives you the number, either thisPosition from the click event, or e.key from typing the key
     let character = document.createElement('span');//creates span to add numbers
@@ -266,6 +262,7 @@ addOperationEvent(minusButton,subtract);
 addOperationEvent(multiplyButton,multiply);
 addOperationEvent(divideButton,divide);
 addOperationEvent(powerButton,power);
+
 squaredButton.addEventListener('click',()=>{//squares the currently active number
     clearScreen();
     let character = document.createElement('span');
@@ -297,6 +294,9 @@ squaredButton.addEventListener('click',()=>{//squares the currently active numbe
     
 })
 equalsButton.addEventListener('click',()=>{
+    equalize()
+})
+function equalize () {
     if (setOperation === null||setOperation === undefined){
         return//if you're just pressing "=" nothing happens
     }
@@ -308,7 +308,7 @@ equalsButton.addEventListener('click',()=>{
             displayError();
         }
         else {
-
+    
             let character = document.createElement('span');
             screen.appendChild(character);
             character.textContent=`${result}`;//writes result on the screen
@@ -320,7 +320,7 @@ equalsButton.addEventListener('click',()=>{
             percentageSymbolPresent=false;
         }
     }
-})
+}
 
 
 function clearScreen () {
@@ -329,11 +329,41 @@ function clearScreen () {
     }
 }
 
+document.addEventListener ('keypress',(e)=>{ //keyboard support 
+    if (!isNaN(e.key)){//if the pressed key is a number
+        numberTyping(e.key)//types the numbers
+    }
+    if (e.key==='*'){//sets operations
+        pickOperation(multiply)
+    }
+    if (e.key==='+'){//sets operations
+        pickOperation(add)
+    }
+    if (e.key==='-'){//sets operations
+        pickOperation(subtract)
+    }
+    if (e.key==='/'||e.key===':'){//sets operations
+        pickOperation(divide)
+    }
+    if (e.key==='='||e.key==='Enter'){//sets operations
+        equalize()
+    }
+
+ })
+
+ document.addEventListener('keypress',(e)=>{
+    console.log(e.key)
+})
+
 function addOperationEvent (button, operation){
     button.addEventListener('click',()=>{
-        setOperation = operation
-        activeNo=2;
+        pickOperation(operation)
     })
+}
+
+function pickOperation (operation) {//for use in setting operation with buttons and keyboard
+    setOperation = operation
+    activeNo=2;
 }
 
 function operate(a,b, operation){
