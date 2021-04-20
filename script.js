@@ -352,6 +352,7 @@ document.addEventListener ('keypress',(e)=>{ //keyboard support
  })
 
  document.addEventListener('keypress',(e)=>{
+    e.preventDefault()
     console.log(e.key)
 })
 
