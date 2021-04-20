@@ -1,14 +1,3 @@
-/*TO DO
-clear comments
-add comments to readme regarding how helpful using comments is
-
-setting operation and equals by keyboard
-
-highlight active operation
-}
-*/
-
-
 const one = document.getElementById("one");
 const two = document.getElementById("two");
 const three = document.getElementById("three");
@@ -21,8 +10,8 @@ const nine = document.getElementById("nine");
 const zero = document.getElementById("zero");
 
 const decimalButton = document.getElementById("decimal");
-const plusButton = document.getElementById("plus");
-const minusButton = document.getElementById("minus");
+const addButton = document.getElementById("plus");
+const subtractButton = document.getElementById("minus");
 const multiplyButton = document.getElementById("multiply");
 const divideButton = document.getElementById("divide");
 const equalsButton = document.getElementById("equals");
@@ -35,7 +24,6 @@ const squaredButton = document.getElementById("squared")
 const powerButton = document.getElementById("power")
 
 const screen = document.getElementById("screen");
-
 const operationButtons = document.getElementsByClassName("operationButton")
 
 let firstNumber ="";
@@ -47,23 +35,31 @@ let subsequent = false; //checks if we are in the aftermath of a calculation, so
 let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid things like "100%55"
 let digitsThatFitOnCalculatorScreen = 15;//number of digits that fit, so the symbols don't overflow the screen
 
+let buttons = document.querySelectorAll("button");//select all buttons, later set activation or not with pushed class
+function removePushedClass(){
+    for (i=0;i<operationButtons.length;i++){
+        operationButtons[i].classList.remove('pushed')
+    }
+}
+function addPushedClass(button){
+    button.classList.add('pushed')
+}
+
+
 
 function fitOnScreen(a){
     a=Math.round(a*100000000000000)/100000000000000//to fix JS doing floating point numbers wrong, based on https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
-
     if (a.toString().length>digitsThatFitOnCalculatorScreen){
         while (a.toString().length>digitsThatFitOnCalculatorScreen&&a%1!==0){
             a=a.toString().slice(0,-1) 
         }
     }
-
     if (a.toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the screen, returns infinity to prompt an error message
         return Infinity
     }
     else {
         return a;
-    }
-    
+    }  
 }
 
 percentageButton.addEventListener('click',()=>{
@@ -85,6 +81,7 @@ percentageButton.addEventListener('click',()=>{
 function displayError(){
     clearScreen();
     clearVariables();
+    removePushedClass();
     let character = document.createElement('span');
     screen.appendChild(character);
     character.textContent='ERROR';//writes ERROR on the screen
@@ -100,6 +97,7 @@ rootButton.addEventListener('click',()=>{//square roots the currently active num
             displayError()
         }
         else {
+            removePushedClass();
             character.textContent=`${firstNumber}`//writes on the screen
         }
         subsequent=true//if it did calculate the square root, it should be subsequent, but also when it gives an ERROR, so that if you start a new calculation, the screen clears etc.
@@ -113,14 +111,19 @@ rootButton.addEventListener('click',()=>{//square roots the currently active num
         }
         else {
             character.textContent=`${secondNumber}`//writes on the screen
+            removePushedClass();
         }
         subsequent=true
     }
 })
-deleteButton.addEventListener('click',()=>{//clears screen, removes last digit from variable, then puts the variable onscreen
+deleteButton.addEventListener('click',()=>{
+    deleteFunction(); 
+})
+
+function deleteFunction(){//clears screen, removes last digit from variable, then puts the variable onscreen, for fitting onscreen purposes
     clearScreen();
     let character = document.createElement('span');
-    if (activeNo===1){
+    if (activeNo===1||secondNumber===""){
         firstNumber=firstNumber.toString().slice(0,-1)//number is turned to a string and last character is removed
         screen.appendChild(character);
         character.textContent=`${firstNumber}`//writes on the screen
@@ -128,7 +131,7 @@ deleteButton.addEventListener('click',()=>{//clears screen, removes last digit f
     else if (activeNo===2){
         if (percentageSymbolPresent===true){//removes the percentage symbol isntead of the digit
             screen.appendChild(character);
-
+    
             percentageSymbolPresent=false;
             secondNumber= 100*secondNumber/firstNumber;//calculated the number before changed by the percentage symbol
             character.textContent=`${secondNumber}`//prints the recalculated secondNumber
@@ -137,11 +140,11 @@ deleteButton.addEventListener('click',()=>{//clears screen, removes last digit f
             secondNumber=secondNumber.toString().slice(0,-1)//number is turned to a string and last character is removed
             screen.appendChild(character);
             character.textContent=`${secondNumber}`//writes on the screen
-
+    
         }
-
+    
     }
-})
+}
 
 clearButton.addEventListener('click',clearVariables)
 clearButton.addEventListener('click',clearScreen)
@@ -187,6 +190,10 @@ signButton.addEventListener('click',()=>{//+/-button changes the sign of the cur
 })
 
 decimalButton.addEventListener('click',()=>{//add decimals
+    addDecimalSymbol();
+})
+
+function addDecimalSymbol(){
     let character = document.createElement('span');//creates span to add symbol
     if (activeNo===1){//if no operation is chosen yet, add to first number
         if (firstNumber===""){//if no number is entered, pressing the decimal buttons creates "0."
@@ -216,7 +223,7 @@ decimalButton.addEventListener('click',()=>{//add decimals
             character.textContent="."
         }
     }
-})
+}
 
 let numberButtons = [zero, one, two, three, four, five, six, seven, eight, nine]//used in the loop below to apply proper numbers to the buttons
 for (i=0;i<numberButtons.length;i++){
@@ -226,9 +233,7 @@ for (i=0;i<numberButtons.length;i++){
     })
 }
 
-
-
- function numberTyping (numberGiver){//what gives you the number, either thisPosition from the click event, or e.key from typing the key
+function numberTyping (numberGiver){//what gives you the number, either thisPosition from the click event, or e.key from typing the key
     let character = document.createElement('span');//creates span to add numbers
     if (activeNo===1){//if no operation is chosen yet, //
         //you are picking the first number, if you are after an operation, the first number is set as the last result, so it is not === ""
@@ -257,8 +262,8 @@ for (i=0;i<numberButtons.length;i++){
     }
 
 }
-addOperationEvent(plusButton,add);// sets the setOperation variable - the operation that is currently chosen
-addOperationEvent(minusButton,subtract);
+addOperationEvent(addButton,add);// sets the setOperation variable - the operation that is currently chosen
+addOperationEvent(subtractButton,subtract);
 addOperationEvent(multiplyButton,multiply);
 addOperationEvent(divideButton,divide);
 addOperationEvent(powerButton,power);
@@ -277,6 +282,7 @@ squaredButton.addEventListener('click',()=>{//squares the currently active numbe
             screen.appendChild(character);
             character.textContent=`${firstNumber}`//writes on the screen
             subsequent=true;
+            removePushedClass();
         }
     }
     else if (activeNo===2){
@@ -289,6 +295,7 @@ squaredButton.addEventListener('click',()=>{//squares the currently active numbe
             screen.appendChild(character);
             character.textContent=`${secondNumber}`//writes on the screen
             subsequent=true;    
+            removePushedClass();
         }
     }
     
@@ -297,6 +304,7 @@ equalsButton.addEventListener('click',()=>{
     equalize()
 })
 function equalize () {
+    removePushedClass();
     if (setOperation === null||setOperation === undefined){
         return//if you're just pressing "=" nothing happens
     }
@@ -329,32 +337,32 @@ function clearScreen () {
     }
 }
 
-document.addEventListener ('keypress',(e)=>{ //keyboard support 
+document.addEventListener ('keydown',(e)=>{ //keyboard support 
     if (!isNaN(e.key)){//if the pressed key is a number
-        numberTyping(e.key)//types the numbers
+        numberTyping(e.key);//types the numbers
     }
-    if (e.key==='*'){//sets operations
-        pickOperation(multiply)
+    if (e.key==='*'||e.key==='x'){//sets operations
+        pickOperation(multiply);
     }
     if (e.key==='+'){//sets operations
-        pickOperation(add)
+        pickOperation(add);
     }
     if (e.key==='-'){//sets operations
-        pickOperation(subtract)
+        pickOperation(subtract);
     }
     if (e.key==='/'||e.key===':'){//sets operations
-        pickOperation(divide)
+        pickOperation(divide);
     }
     if (e.key==='='||e.key==='Enter'){//sets operations
-        equalize()
+        equalize();
     }
-
+    if (e.key==='Backspace'||e.key==='Delete'){//sets operations
+        deleteFunction();
+    }
+    if (e.key==='.'||e.key===','){//adds decimal symbol
+        addDecimalSymbol();
+    }
  })
-
- document.addEventListener('keypress',(e)=>{
-    e.preventDefault()
-    console.log(e.key)
-})
 
 function addOperationEvent (button, operation){
     button.addEventListener('click',()=>{
@@ -363,13 +371,31 @@ function addOperationEvent (button, operation){
 }
 
 function pickOperation (operation) {//for use in setting operation with buttons and keyboard
-    setOperation = operation
+    removePushedClass();
+    setOperation = operation;
+    addPushedClass(decideWhichOperationIsPushed());
     activeNo=2;
+}
+function decideWhichOperationIsPushed(){//decides which operation button is visually selected
+    if (setOperation===add){
+        return addButton;
+    }
+    if (setOperation===multiply){
+        return multiplyButton;
+    }
+    if (setOperation===subtract){
+        return subtractButton
+    }
+    if (setOperation===divide){
+        return divideButton
+    }
+    if (setOperation===power){
+        return powerButton
+    }
 }
 
 function operate(a,b, operation){
     return operation(a,b)
-    
 }
 function add (a,b) {
 	return Number(a)+Number(b);

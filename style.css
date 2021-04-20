@@ -20,11 +20,6 @@ a {
 #screen {
   background-color: rgb(211, 230, 225);
   color:black;
-  /* font-family: 'Press Start 2P', cursive; */
-  /* font-family: 'Unica One'; */
-  /* font-family:'Aldrich'; */
-  /* font-family: 'VT323', monospace; */
-  /* font-family: 'Roboto Mono', monospace; */
   font-family: 'Ubuntu Mono', monospace;
   font-size:35px;
   padding-top:0px;
@@ -50,9 +45,7 @@ a {
 }
 
 #calculator {
-  /* background-color: rgb(29, 54, 68); */
   background-color:rgb(156, 203, 193);
-  /* padding: 15px; */
   border-radius:15px;
   border: solid black 1px;
   box-shadow: 0px 0px 3px 1px black;
@@ -68,7 +61,7 @@ button {
   outline:0;
 }
 
-button:active{
+button:active, .pushed{
   transform: translateY(1px);
-  background-color:rgb(156, 223, 207);
+  background-color:rgb(118, 223, 198);
 }
