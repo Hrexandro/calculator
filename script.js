@@ -29,7 +29,7 @@ const operationButtons = document.getElementsByClassName("operationButton")
 let firstNumber ="";
 let secondNumber="";
 let activeNo=1;//sets whether you are entering the first number or second
-let setOperation;//what mathematical operation is currently set
+let selectedOperation;//what mathematical operation is currently selected
 let subsequent = false; //checks if we are in the aftermath of a calculation, so that when entering a number instead of a new operation,
 //the firstNumber is substituted and not added to
 let percentageSymbolPresent = false //checks whether the percentage symbol has been displayed on screen, to avoid things like "100%55"
@@ -54,11 +54,11 @@ function fitOnScreen(a){
             a=a.toString().slice(0,-1) 
         }
     }
-    if (a.toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the screen, returns infinity to prompt an error message
+    if (Number(a).toString().length>digitsThatFitOnCalculatorScreen){//if the length is still higher than the space on the screen, returns infinity to prompt an error message
         return Infinity
     }
     else {
-        return a;
+        return Number(a);
     }  
 }
 
@@ -153,7 +153,7 @@ function clearVariables() {
     firstNumber ="";
     secondNumber="";
     activeNo=1;
-    setOperation=null;
+    selectedOperation=null;
     subsequent = false
     removePushedClass();
 }
@@ -198,9 +198,11 @@ function addDecimalSymbol(){
     let character = document.createElement('span');//creates span to add symbol
     if (activeNo===1){//if no operation is chosen yet, add to first number
         if (firstNumber===""){//if no number is entered, pressing the decimal buttons creates "0."
+            clearScreen()//if for example, the error message is visible
             firstNumber+="0."
             screen.appendChild(character);
             character.textContent="0."//writes on the screen
+            subsequent=false
         }
         else {
             if (!String(firstNumber).includes(".")){//makes sure there is no decimal symbol already, so that it does not appear multiple times in a single number
@@ -255,7 +257,7 @@ function numberTyping (numberGiver){//what gives you the number, either thisPosi
             clearScreen();
             secondNumber=""//needed if the percentage symbol is present
         }
-        if (firstNumber.toString().length<=digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
+        if (secondNumber.toString().length<digitsThatFitOnCalculatorScreen){//so that it does nothing if there are too many numbers
             secondNumber+=`${numberGiver}`//set second number
             screen.appendChild(character);
             character.textContent=`${numberGiver}`//writes numbers on the screen
@@ -263,7 +265,7 @@ function numberTyping (numberGiver){//what gives you the number, either thisPosi
     }
 
 }
-addOperationEvent(addButton,add);// sets the setOperation variable - the operation that is currently chosen
+addOperationEvent(addButton,add);// sets the selectedOperation variable - the operation that is currently chosen
 addOperationEvent(subtractButton,subtract);
 addOperationEvent(multiplyButton,multiply);
 addOperationEvent(divideButton,divide);
@@ -305,25 +307,24 @@ equalsButton.addEventListener('click',()=>{
     equalize()
 })
 function equalize () {
-    removePushedClass();
-    if (setOperation === null||setOperation === undefined){
+    if (selectedOperation === null||selectedOperation === undefined){
         return//if you're just pressing "=" nothing happens
     }
     else {
+        removePushedClass();
         clearScreen();
-        let result=operate(firstNumber,secondNumber,setOperation)//calculate
+        let result=operate(firstNumber,secondNumber,selectedOperation)//calculate
         result=fitOnScreen(result)
         if (result===Infinity){
             displayError();
         }
-        else {
-    
+        else {    
             let character = document.createElement('span');
             screen.appendChild(character);
             character.textContent=`${result}`;//writes result on the screen
             firstNumber=result;
             secondNumber="";
-            setOperation=null;
+            selectedOperation=null;
             activeNo=1;
             subsequent=true;
             percentageSymbolPresent=false;
@@ -355,6 +356,7 @@ document.addEventListener ('keydown',(e)=>{ //keyboard support
         pickOperation(divide);
     }
     if (e.key==='='||e.key==='Enter'){//sets operations
+        e.preventDefault();
         equalize();
     }
     if (e.key==='Backspace'||e.key==='Delete'){//sets operations
@@ -372,29 +374,32 @@ function addOperationEvent (button, operation){
 }
 
 function pickOperation (operation) {//for use in setting operation with buttons and keyboard
+    if (secondNumber!==""){//if you select operation after entering the second number, you are starting the next operation
+        equalize()
+    }
     removePushedClass();
-    setOperation = operation;
+    selectedOperation = operation;
     addPushedClass(decideWhichOperationIsPushed());
-    if (firstNumber===""){
+    if (firstNumber===""){//if you select operation before picking the number, it doesn't switch to second leaving first one blank
         firstNumber=secondNumber;
         secondNumber="";
     }
     activeNo=2;
 }
 function decideWhichOperationIsPushed(){//decides which operation button is visually selected
-    if (setOperation===add){
+    if (selectedOperation===add){
         return addButton;
     }
-    if (setOperation===multiply){
+    if (selectedOperation===multiply){
         return multiplyButton;
     }
-    if (setOperation===subtract){
+    if (selectedOperation===subtract){
         return subtractButton
     }
-    if (setOperation===divide){
+    if (selectedOperation===divide){
         return divideButton
     }
-    if (setOperation===power){
+    if (selectedOperation===power){
         return powerButton
     }
 }
